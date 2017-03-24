@@ -157,7 +157,6 @@ int main()
 	cout << "\n\nAVL:\n";
 	in_order(&root_avl);
 
-awfawfwafwafwa
 	clear(&root, 0);
 	clear(&root_avl, 0);
 	_getch();
