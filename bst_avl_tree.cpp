@@ -101,7 +101,7 @@ leaf* return_parent(leaf *root, int index)
 void remove(leaf *root, int index)
 {
 	int counter = 0,lcapture=0;
-	leaf *parent,*main;
+	leaf *parent,*main,*temp;
 	parent = main = root;
 	if (root->key != index)
 	{
@@ -116,9 +116,17 @@ void remove(leaf *root, int index)
 		lcapture = 1;
 	}
 	if (main->right != NULL)counter++;
-	if (root->key == index || counter == 2)
+
+	if (root->key == index && counter == 1)
 	{
-		//usun 2 wierzcholki
+		if (main->left == NULL)root = main->right;
+		else root = main->left;
+	}
+	else if (root->key == index || counter == 2)
+	{
+		temp = main;
+		main->key = min_leaf(temp->right);
+		remove(main->right, main->key);
 	}
 	else if (counter == 1)
 	{
@@ -131,8 +139,8 @@ void remove(leaf *root, int index)
 		{
 			if (lcapture == 1)parent->right = parent->right->left;
 			else parent->right = parent->right->right;
-			delete main;
 		}
+		delete main;
 	}
 	else if (counter == 0)
 	{
@@ -145,14 +153,13 @@ void remove(leaf *root, int index)
 int main()
 {
 	srand(time(NULL));
-	int size = 10, index = 27;
+	int size = 100000, index;
 	vector<int> array, sort_array;
 	random(size, array);
 	index = 8;
 	sort_array = array;
 	sort(sort_array.begin(), sort_array.end());
-
-	wyswietl(array); wyswietl(sort_array);
+	//wyswietl(array); wyswietl(sort_array);
 
 	root.key = array[0];
 	root.left = NULL;
@@ -165,10 +172,11 @@ int main()
 	root_avl.right = NULL;
 
 	create_bst(&root, size, array);
+
+	/*
 	create_avl(&root_avl, 0, center-1, sort_array);
 	create_avl(&root_avl, center + 1, array.size() - 1, sort_array);
 
-	/*
 	cout << "PRE:\n";
 	pre_order(&root);
 	cout << "\nIN:\n";
@@ -181,18 +189,18 @@ int main()
 	cout << "\n\nAVL:\n";
 	in_order(&root_avl);
 
-	*/
+	
 
-	cout << "\nPodaj wartosc: "; cin >> index;
-	in_order(&root);
-	remove(&root, index);
-	cout << endl;
-	in_order(&root);
+	//cout << "\nPodaj wartosc: "; cin >> index;
+	//in_order(&root);
+	//remove(&root, index);
+	//cout << endl;
+	//in_order(&root);
 
 
 	clear(&root, 0);
-	clear(&root_avl, 0);
-
+	//clear(&root_avl, 0);
+	*/
 	_getch();
     return 0;
 }
@@ -244,5 +252,5 @@ void wyswietl(vector<int> array)
 void random(int size, vector<int> &array)
 {
 	for (int i = 0; i < size; i++)
-		array.push_back(rand() % 100);
+		array.push_back(rand() % 990000);
 }
