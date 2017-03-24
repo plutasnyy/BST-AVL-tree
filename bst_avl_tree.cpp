@@ -14,11 +14,14 @@ struct leaf
 	leaf *left;
 	leaf *right;
 }root, root_avl;
-void wyswietl(vector<int> array);
+
+//BASIC 
 double in_order(leaf *root);
 double pre_order(leaf *root);
 double post_order(leaf *root);
+void wyswietl(vector<int> array);
 void random(int size, vector<int> &array);
+void clear(leaf *root, int pom);
 
 void add_leaf(leaf *root, leaf *new_leaf)
 {
@@ -36,18 +39,6 @@ void add_leaf(leaf *root, leaf *new_leaf)
 		else
 			add_leaf((*root).right, new_leaf);
 	}
-}
-void clear(leaf *root, int pom)
-{
-	if ((*root).left != NULL)
-		clear((*root).left,1);
-
-	if ((*root).right != NULL)
-		clear((*root).right,1);
-
-	if(pom==1)
-		delete root;
-	else cout << "\n KORZEN: " << root->key << endl;
 }
 double create_bst(leaf *root, int size, vector<int> array)
 {
@@ -109,16 +100,21 @@ leaf* return_parent(leaf *root, int index)
 }
 void remove(leaf *root, int index)
 {
-	int counter = 0;
+	int counter = 0,lcapture=0;
 	leaf *parent,*main;
+	parent = main = root;
 	if (root->key != index)
 	{
 		parent = return_parent(root, index);
 		if (parent->key == -1)return;
-		if (index >= parent->key) main = parent->right;
+		if (index > parent->key) main = parent->right;
 		else main = parent->left;
 	}
-	if (main->left != NULL)counter++;
+	if (main->left != NULL)
+	{
+		counter++;
+		lcapture = 1;
+	}
 	if (main->right != NULL)counter++;
 	if (root->key == index || counter == 2)
 	{
@@ -126,7 +122,17 @@ void remove(leaf *root, int index)
 	}
 	else if (counter == 1)
 	{
-		//usun 1 wierzcholek
+		if (parent->key > index)
+		{
+			if (lcapture == 1) parent->left = parent->left->left;
+			else parent->left = parent->left->right;
+		}
+		else
+		{
+			if (lcapture == 1)parent->right = parent->right->left;
+			else parent->right = parent->right->right;
+			delete main;
+		}
 	}
 	else if (counter == 0)
 	{
@@ -143,7 +149,6 @@ int main()
 	vector<int> array, sort_array;
 	random(size, array);
 	index = 8;
-//	array[8] = 27;
 	sort_array = array;
 	sort(sort_array.begin(), sort_array.end());
 
@@ -163,6 +168,7 @@ int main()
 	create_avl(&root_avl, 0, center-1, sort_array);
 	create_avl(&root_avl, center + 1, array.size() - 1, sort_array);
 
+	/*
 	cout << "PRE:\n";
 	pre_order(&root);
 	cout << "\nIN:\n";
@@ -175,8 +181,10 @@ int main()
 	cout << "\n\nAVL:\n";
 	in_order(&root_avl);
 
+	*/
 
-	cout << endl;
+	cout << "\nPodaj wartosc: "; cin >> index;
+	in_order(&root);
 	remove(&root, index);
 	cout << endl;
 	in_order(&root);
@@ -188,7 +196,18 @@ int main()
 	_getch();
     return 0;
 }
+void clear(leaf *root, int pom)
+{
+	if ((*root).left != NULL)
+		clear((*root).left, 1);
 
+	if ((*root).right != NULL)
+		clear((*root).right, 1);
+
+	if (pom == 1)
+		delete root;
+	else cout << "\nKORZEN: " << root->key << endl;
+}
 double in_order(leaf *root)
 {
 	if (root->left != NULL)
