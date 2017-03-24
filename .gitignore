@@ -1,4 +1,5 @@
 Debug
-stadfx
-targetver
-*.vcxproj
+bst_avl_tree.vcxproj
+bst_avl_tree.vcxproj.filters
+stdafx.cpp
+stdafx.h
