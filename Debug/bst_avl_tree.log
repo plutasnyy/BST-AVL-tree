@@ -1,0 +1,5 @@
+﻿  bst_avl_tree.cpp
+c:\users\kamil\documents\visual studio 2015\projects\bst_avl_tree\bst_avl_tree\bst_avl_tree.cpp(18): warning C4018: '<': signed/unsigned mismatch
+c:\users\kamil\documents\visual studio 2015\projects\bst_avl_tree\bst_avl_tree\bst_avl_tree.cpp(129): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  bst_avl_tree.vcxproj -> C:\Users\Kamil\Documents\Visual Studio 2015\Projects\bst_avl_tree\Debug\bst_avl_tree.exe
+  bst_avl_tree.vcxproj -> C:\Users\Kamil\Documents\Visual Studio 2015\Projects\bst_avl_tree\Debug\bst_avl_tree.pdb (Full PDB)
