@@ -8,6 +8,8 @@
 #include <iostream>
 #include <vector>
 using namespace std;
+string cr, cl, cp;      // ³añcuchy do znaków ramek
+
 struct leaf
 {
 	int key;
@@ -15,6 +17,24 @@ struct leaf
 	leaf *right;
 }root, root_avl;
 
+void printBT(string sp, string sn, leaf * v)
+{
+	string s;
+
+	if (v)
+	{
+		s = sp;
+		if (sn == cr) s[s.length() - 2] = ' ';
+		printBT(s + cp, cr, v->right);
+
+		s = s.substr(0, sp.length() - 2);
+		cout << s << sn << v->key << endl;
+
+		s = sp;
+		if (sn == cl) s[s.length() - 2] = ' ';
+		printBT(s + cp, cl, v->left);
+	}
+}
 //BASIC 
 double in_order(leaf *root);
 double pre_order(leaf *root);
@@ -100,6 +120,7 @@ leaf* return_parent(leaf *root, int index)
 }
 void remove(leaf *root, int index)
 {
+	//TODO: remember parent`s node to main node in pointer, remove all unnecesary ifs..
 	int counter = 0,lcapture=0;
 	leaf *parent,*main,*temp;
 	parent = main = root;
@@ -150,11 +171,53 @@ void remove(leaf *root, int index)
 	}
 	cout << endl;
 }
+int return_diff(leaf *root, int pom)
+{
+	int left = 0;
+	if (root->left != NULL)left = return_diff(root->left,1);
+
+	int right = 0;
+	if (root->right != NULL)right = return_diff(root->right,1);
+
+	if (pom == 0)return left - right;
+	else return max(left, right) + 1;
+}
+void r_rotation(leaf *root, leaf *main)
+{
+	leaf *parent_node;
+	leaf temp,temp2,temp3;
+	leaf *parent;
+	parent = return_parent(root, main->key);
+	if (parent->key > main->key)parent_node = (*parent).left;
+	else parent_node = (*parent).right;
+	temp2 = *(main->left->right);
+	temp3 = *(main);
+	*(parent_node) =*( main->left);
+	*(parent_node->right) = temp3;
+	*(parent_node->right->left) = temp2;
+}
+void balancing_tree(leaf *root, leaf *remember_root)
+{
+	int diff = return_diff(root, 0);
+	//if (diff < -1)l_rotation(root,remember_root);
+	//else if (diff > 1)r_rotation(root, remember_root);
+	if(1)
+	{
+		if (root->left != NULL)balancing_tree(root->left, remember_root);
+		if (root->right != NULL)balancing_tree(root->right, remember_root);
+	}
+
+}
 int main()
 {
+	cr = cl = cp = "  ";
+	cr[0] = 218; cr[1] = 196;
+	cl[0] = 192; cl[1] = 196;
+	cp[0] = 179;
+
 	srand(time(NULL));
-	int size = 100000, index;
-	vector<int> array, sort_array;
+	int size = 30, index,count=0;
+	vector<int> array, sort_array, to_remove;
 	random(size, array);
 	index = 8;
 	sort_array = array;
@@ -172,10 +235,30 @@ int main()
 	root_avl.right = NULL;
 
 	create_bst(&root, size, array);
-
-	/*
 	create_avl(&root_avl, 0, center-1, sort_array);
 	create_avl(&root_avl, center + 1, array.size() - 1, sort_array);
+
+
+	printBT("", "", &root_avl);
+	//balancing_tree(&root, &root
+	r_rotation(&root_avl,root_avl.left);
+	cout << endl;
+	printBT("", "", &root_avl);
+	/*
+	cin >> count;
+	int pom;
+	for (int i = 0; i < count; i++)
+	{
+		cin >> pom;
+		to_remove.push_back(pom);
+	}
+	for (int i = 0; i < count; i++)
+	{
+		remove(&root, to_remove[i]);
+	}
+
+
+	printBT("", "", &root);
 
 	cout << "PRE:\n";
 	pre_order(&root);
@@ -252,5 +335,5 @@ void wyswietl(vector<int> array)
 void random(int size, vector<int> &array)
 {
 	for (int i = 0; i < size; i++)
-		array.push_back(rand() % 990000);
+		array.push_back(rand() % 100);
 }
