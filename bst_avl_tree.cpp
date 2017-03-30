@@ -181,7 +181,7 @@ int return_diff(leaf *root, int pom)
 	if (root->right != NULL)right = return_diff(root->right,1);
 
 	if (pom == 0)return left - right;
-	else return max(left, right) + 1;
+	return left + right + 1;
 }
 void r_rotation(leaf **edge)
 {
@@ -207,20 +207,27 @@ void l_rotation(leaf **edge)
 }
 void balancing_tree(leaf *root)
 {
+	if (root->left != NULL)balancing_tree(root->left);
+	if (root->right != NULL)balancing_tree(root -> right);
+
 	int wsp = 0;
-	wsp = return_diff(root, 1);
-	if (wsp > 1)
+	wsp = return_diff(root, 0);
+	if (wsp > 2)
 	{
 		r_rotation(&root);
 		balancing_tree(root);
 	}
-	if (wsp < -1)
+	if (wsp < -2)
 	{
 		l_rotation(&root);
 		balancing_tree(root);
 	}
-	if (root->left != NULL)balancing_tree(root->left);
-	if (root->right != NULL)balancing_tree(root -> right);
+}
+void ustal(leaf *root)
+{
+	root->key = return_diff(root,0);
+	if (root->left != NULL)ustal(root->left);
+	if (root->right != NULL)ustal(root->right);
 }
 int main()
 {
@@ -255,6 +262,7 @@ int main()
 	wsk = &root;
 
 	printBT("", "", wsk);
+	//ustal(wsk);
 	balancing_tree(wsk);
 	printBT("", "", wsk);
 	/*
