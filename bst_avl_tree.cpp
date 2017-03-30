@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <assert.h>
 using namespace std;
 string cr, cl, cp;      // ³añcuchy do znaków ramek
 
@@ -182,31 +183,44 @@ int return_diff(leaf *root, int pom)
 	if (pom == 0)return left - right;
 	else return max(left, right) + 1;
 }
-void r_rotation(leaf *root, leaf *main)
+void r_rotation(leaf **edge)
 {
-	leaf *parent_node;
-	leaf temp,temp2,temp3;
-	leaf *parent;
-	parent = return_parent(root, main->key);
-	if (parent->key > main->key)parent_node = (*parent).left;
-	else parent_node = (*parent).right;
-	temp2 = *(main->left->right);
-	temp3 = *(main);
-	*(parent_node) =*( main->left);
-	*(parent_node->right) = temp3;
-	*(parent_node->right->left) = temp2;
-}
-void balancing_tree(leaf *root, leaf *remember_root)
-{
-	int diff = return_diff(root, 0);
-	//if (diff < -1)l_rotation(root,remember_root);
-	//else if (diff > 1)r_rotation(root, remember_root);
-	if(1)
+	leaf *top = *edge;
+	if (top->left != NULL)
 	{
-		if (root->left != NULL)balancing_tree(root->left, remember_root);
-		if (root->right != NULL)balancing_tree(root->right, remember_root);
+		leaf *left_node = top->left;
+		top->left = left_node->right;
+		*edge = left_node;
+		left_node->right = top;
 	}
-
+}
+void l_rotation(leaf **edge)
+{
+	leaf *top = *edge;
+	if (top->right != NULL)
+	{
+		leaf *right_node = top->right;
+		top->right = right_node->left;
+		*edge = right_node;
+		right_node->left = top;
+	}
+}
+void balancing_tree(leaf *root)
+{
+	int wsp = 0;
+	wsp = return_diff(root, 1);
+	if (wsp > 1)
+	{
+		r_rotation(&root);
+		balancing_tree(root);
+	}
+	if (wsp < -1)
+	{
+		l_rotation(&root);
+		balancing_tree(root);
+	}
+	if (root->left != NULL)balancing_tree(root->left);
+	if (root->right != NULL)balancing_tree(root -> right);
 }
 int main()
 {
@@ -216,7 +230,7 @@ int main()
 	cp[0] = 179;
 
 	srand(time(NULL));
-	int size = 30, index,count=0;
+	int size = 10, index,count=0;
 	vector<int> array, sort_array, to_remove;
 	random(size, array);
 	index = 8;
@@ -237,13 +251,12 @@ int main()
 	create_bst(&root, size, array);
 	create_avl(&root_avl, 0, center-1, sort_array);
 	create_avl(&root_avl, center + 1, array.size() - 1, sort_array);
+	leaf *wsk;
+	wsk = &root;
 
-
-	printBT("", "", &root_avl);
-	//balancing_tree(&root, &root
-	r_rotation(&root_avl,root_avl.left);
-	cout << endl;
-	printBT("", "", &root_avl);
+	printBT("", "", wsk);
+	balancing_tree(wsk);
+	printBT("", "", wsk);
 	/*
 	cin >> count;
 	int pom;
