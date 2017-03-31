@@ -1,15 +1,16 @@
-#include "stdafx.h"
 #include <string>
 #include <algorithm>
 #include <ctime>
 #include <conio.h>
 #include <cstdlib>
+#include <windows.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include <assert.h>
+#include <cmath>
 using namespace std;
-string cr, cl, cp;      // ³añcuchy do znaków ramek
+string cr, cl, cp;      // Â³aÃ±cuchy do znakÃ³w ramek
 
 struct leaf
 {
@@ -36,7 +37,7 @@ void printBT(string sp, string sn, leaf * v)
 		printBT(s + cp, cl, v->left);
 	}
 }
-//BASIC 
+//BASIC
 double in_order(leaf *root);
 double pre_order(leaf *root);
 double post_order(leaf *root);
@@ -78,7 +79,7 @@ double create_avl(leaf *root_avl, int start, int end, vector<int> array)
 	leaf *new_leaf = new leaf;
 	new_leaf->left = NULL;
 	new_leaf->right = NULL;
-	if (start == end) 
+	if (start == end)
 	{
 		new_leaf->key = array[start];
 		add_leaf(root_avl, new_leaf);
@@ -172,6 +173,10 @@ void remove(leaf *root, int index)
 	}
 	cout << endl;
 }
+int depth(leaf *root)
+{
+    return root->right!=NULL? depth(root->right)+1:0;
+}
 int return_diff(leaf *root, int pom)
 {
 	int left = 0;
@@ -181,11 +186,16 @@ int return_diff(leaf *root, int pom)
 	if (root->right != NULL)right = return_diff(root->right,1);
 
 	if (pom == 0)return left - right;
-	return left + right + 1;
+	return max(left,right) + 1;
 }
 void r_rotation(leaf **edge)
 {
+
 	leaf *top = *edge;
+
+  //  cout<<"r rotuje: "<<top->key<<endl;
+	assert(edge);
+	assert(top->left);
 	if (top->left != NULL)
 	{
 		leaf *left_node = top->left;
@@ -197,6 +207,11 @@ void r_rotation(leaf **edge)
 void l_rotation(leaf **edge)
 {
 	leaf *top = *edge;
+
+  //  cout<<"l rotuje: "<<top->key<<endl;
+	assert(edge);
+	assert(top->right);
+
 	if (top->right != NULL)
 	{
 		leaf *right_node = top->right;
@@ -205,29 +220,33 @@ void l_rotation(leaf **edge)
 		right_node->left = top;
 	}
 }
-void balancing_tree(leaf *root)
+void to_list(leaf **root)
 {
-	if (root->left != NULL)balancing_tree(root->left);
-	if (root->right != NULL)balancing_tree(root -> right);
-
-	int wsp = 0;
-	wsp = return_diff(root, 0);
-	if (wsp > 2)
-	{
-		r_rotation(&root);
-		balancing_tree(root);
-	}
-	if (wsp < -2)
-	{
-		l_rotation(&root);
-		balancing_tree(root);
-	}
+    leaf *top=*root;
+    while(top->left!=NULL)r_rotation(&top);
+    *root=top;
+    if(top->right!=NULL)to_list(&top->right);
 }
-void ustal(leaf *root)
+void rotation_queue(leaf **root, int m)
 {
-	root->key = return_diff(root,0);
-	if (root->left != NULL)ustal(root->left);
-	if (root->right != NULL)ustal(root->right);
+    leaf *temp=*root;
+    l_rotation(&temp);
+    if(m>0)rotation_queue(&temp->right,m-1);
+    *root=temp;
+}
+void list_to_avl(leaf **root,int n)
+{
+    rotation_queue(root,n/2-1);
+    while(abs(return_diff(*root,0))>1)
+    {
+        rotation_queue(root,(depth(*root)-1)/2);
+    }
+}
+void ustal(leaf *wsk)
+{
+    wsk->key=return_diff(wsk,0);
+    if(wsk->left!=NULL)ustal(wsk->left);
+    if(wsk->right!=NULL)ustal(wsk->right);
 }
 int main()
 {
@@ -237,7 +256,7 @@ int main()
 	cp[0] = 179;
 
 	srand(time(NULL));
-	int size = 10, index,count=0;
+	int size = 5999, index,count=0;
 	vector<int> array, sort_array, to_remove;
 	random(size, array);
 	index = 8;
@@ -258,13 +277,21 @@ int main()
 	create_bst(&root, size, array);
 	create_avl(&root_avl, 0, center-1, sort_array);
 	create_avl(&root_avl, center + 1, array.size() - 1, sort_array);
+
 	leaf *wsk;
 	wsk = &root;
 
-	printBT("", "", wsk);
 	//ustal(wsk);
-	balancing_tree(wsk);
-	printBT("", "", wsk);
+	//printBT("", "", wsk);
+
+    to_list(&wsk);
+   // printBT("", "",wsk);
+    list_to_avl(&wsk,size);
+
+  //  printBT("", "",wsk);
+    ustal(wsk);
+    printBT("","",wsk);
+	//balancing_tree(&wsk);
 	/*
 	cin >> count;
 	int pom;
@@ -277,31 +304,23 @@ int main()
 	{
 		remove(&root, to_remove[i]);
 	}
-
-
 	printBT("", "", &root);
-
 	cout << "PRE:\n";
 	pre_order(&root);
 	cout << "\nIN:\n";
 	in_order(&root);
 	cout << "\nPOST:\n";
 	post_order(&root);
-
 	cout << "\n\nMIN: " << min_leaf(&root);
 	cout << endl;
 	cout << "\n\nAVL:\n";
 	in_order(&root_avl);
-
-	
 
 	//cout << "\nPodaj wartosc: "; cin >> index;
 	//in_order(&root);
 	//remove(&root, index);
 	//cout << endl;
 	//in_order(&root);
-
-
 	clear(&root, 0);
 	//clear(&root_avl, 0);
 	*/
