@@ -9,6 +9,7 @@
 #include <vector>
 #include <assert.h>
 #include <cmath>
+#include <stack>
 using namespace std;
 string cr, cl, cp;      // ³añcuchy do znaków ramek
 
@@ -44,10 +45,15 @@ double post_order(leaf *root);
 void wyswietl(vector<int> array);
 void random(int size, vector<int> &array);
 void clear(leaf *root, int pom);
+bool isNumber(string c);
+int toNumber(string c);
+int wprowadz();
+void delete_function(stack<int> &stos);
+
 
 void add_leaf(leaf *root, leaf *new_leaf)
 {
-	if ((*root).key > (*new_leaf).key)
+	if ((*root).key >= (*new_leaf).key)
 	{
 		if ((*root).left == NULL)
 			(*root).left = &(*new_leaf);
@@ -256,13 +262,15 @@ int main()
 	cp[0] = 179;
 
 	srand(time(NULL));
-	int size = 3000, index,count=0;
+	int size = 10,count=0;
 	vector<int> array, sort_array, to_remove;
 	random(size, array);
-	index = 8;
 	sort_array = array;
 	sort(sort_array.begin(), sort_array.end());
-	//wyswietl(array); wyswietl(sort_array);
+	cout<<"TABLICA:\n";
+	wyswietl(array);
+	cout<<"TABLICA POSORTOWANA:\n";
+	wyswietl(sort_array);
 
 	root.key = array[0];
 	root.left = NULL;
@@ -279,53 +287,85 @@ int main()
 	create_avl(&root_avl, center + 1, array.size() - 1, sort_array);
 
 	leaf *wsk;
-	wsk = &root;
-
-	//ustal(wsk);
-	//printBT("", "", wsk);
-
-    to_list(&wsk);
-   // printBT("", "",wsk);
-    list_to_avl(&wsk,size);
-
-  //  printBT("", "",wsk);
-    ustal(wsk);
+	wsk = &root_avl;
+    cout<<"\n\nDRZEWO AVL:\n";
     printBT("","",wsk);
-	//balancing_tree(&wsk);
-	/*
-	cin >> count;
-	int pom;
-	for (int i = 0; i < count; i++)
-	{
-		cin >> pom;
-		to_remove.push_back(pom);
-	}
-	for (int i = 0; i < count; i++)
-	{
-		remove(&root, to_remove[i]);
-	}
-	printBT("", "", &root);
-	cout << "PRE:\n";
+    wsk=&root;
+
+    cout<<"\n\nDRZEWO BST:\n";
+    printBT("","",wsk);
+
+    cout<<"\nMINIMUM AVL: "<<min_leaf(&root_avl)<<"\nMINIMUM BST: "<<min_leaf(&root)<<endl<<endl;
+
+	cout << "\nPRE:\n";
 	pre_order(&root);
 	cout << "\nIN:\n";
 	in_order(&root);
 	cout << "\nPOST:\n";
 	post_order(&root);
-	cout << "\n\nMIN: " << min_leaf(&root);
-	cout << endl;
-	cout << "\n\nAVL:\n";
-	in_order(&root_avl);
+	cout<<endl<<endl;
 
-	//cout << "\nPodaj wartosc: "; cin >> index;
-	//in_order(&root);
-	//remove(&root, index);
-	//cout << endl;
-	//in_order(&root);
+    cout<<"PODAJ ILE LISCI CHCESZ USUNAC <0;9>: ";
+    stack<int>stos;
+    delete_function(stos);
+    int pom;
+
+	while(!stos.empty())
+	{
+	    pom=stos.top();
+	    stos.pop();
+		remove(&root,pom);
+	}
+	cout<<"\nPO USUNIECIU, A POTEM ZROWNOWAZONE:\n";
+     printBT("","",&root);
+
+    wsk=&root;
+    to_list(&wsk);
+    list_to_avl(&wsk,size);
+    printBT("","",wsk);
+    cout<<endl;
+
 	clear(&root, 0);
-	//clear(&root_avl, 0);
-	*/
+	clear(&root_avl,0);
+
 	_getch();
     return 0;
+}
+bool isNumber(string c)
+{
+    for(int i=0;i<c.size();i++)
+        if(c[i]<=47||c[i]>=58)return false;
+    return true;
+}
+int toNumber(string c)
+{
+    int pom=0;
+    int licz=1;
+    for(int i=c.size()-1;i>=0;i--)
+    {
+        pom+=(c[i]-48)*licz;
+        licz*=10;
+    }
+    return pom;
+}
+int wprowadz()
+{
+    string c;
+    cin>>c;
+    while(!isNumber(c))
+    {
+        cout<<"\nJESZCZE RAZ\n";
+        cin>>c;
+    }
+    return toNumber(c);
+}
+void delete_function(stack<int> &stos)
+{
+    int pom;
+    pom=wprowadz();
+    cout<<"\nTERAZ PODAJ ZNAKI:\n";
+    for(int i=0;i<pom;i++)
+        stos.push(wprowadz());
 }
 void clear(leaf *root, int pom)
 {
@@ -337,7 +377,7 @@ void clear(leaf *root, int pom)
 
 	if (pom == 1)
 		delete root;
-	else cout << "\nKORZEN: " << root->key << endl;
+	else cout << "KORZEN: " << root->key << endl;
 }
 double in_order(leaf *root)
 {
