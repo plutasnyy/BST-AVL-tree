@@ -256,7 +256,7 @@ int main()
 	cp[0] = 179;
 
 	srand(time(NULL));
-	int size = 5999, index,count=0;
+	int size = 3000, index,count=0;
 	vector<int> array, sort_array, to_remove;
 	random(size, array);
 	index = 8;
