@@ -126,8 +126,9 @@ leaf* return_parent(leaf *root, int index)
 	}
 	return parent;
 }
-void remove(leaf *root, int index)
+void remove(leaf **pom, int index)
 {
+    leaf *root=*pom;
 	//TODO: remember parent`s node to main node in pointer, remove all unnecesary ifs..
 	int counter = 0,lcapture=0;
 	leaf *parent,*main,*temp;
@@ -155,7 +156,7 @@ void remove(leaf *root, int index)
 	{
 		temp = main;
 		main->key = min_leaf(temp->right);
-		remove(main->right, main->key);
+		remove(&main->right, main->key);
 	}
 	else if (counter == 1)
 	{
@@ -177,6 +178,7 @@ void remove(leaf *root, int index)
 		else parent->right = NULL;
 		delete main;
 	}
+	*pom=root;
 	cout << endl;
 }
 int depth(leaf *root)
@@ -288,45 +290,42 @@ int main()
 
 	leaf *wsk;
 	wsk = &root_avl;
-    cout<<"\n\nDRZEWO AVL:\n";
+    cout<<"\nDRZEWO AVL:\n";
     printBT("","",wsk);
     wsk=&root;
 
     cout<<"\n\nDRZEWO BST:\n";
     printBT("","",wsk);
 
+    cout<<"\nZROWNOWAZONE BST:\n";
+    to_list(&wsk);
+    list_to_avl(&wsk,size);
+    printBT("","",wsk);
     cout<<"\nMINIMUM AVL: "<<min_leaf(&root_avl)<<"\nMINIMUM BST: "<<min_leaf(&root)<<endl<<endl;
 
 	cout << "\nPRE:\n";
-	pre_order(&root);
+	pre_order(wsk);
 	cout << "\nIN:\n";
-	in_order(&root);
+	in_order(wsk);
 	cout << "\nPOST:\n";
-	post_order(&root);
-	cout<<endl<<endl;
+	post_order(wsk);
 
-    cout<<"PODAJ ILE LISCI CHCESZ USUNAC <0;9>: ";
+    cout<<"\n\nPODAJ ILE LISCI CHCESZ USUNAC <0;9>: ";
     stack<int>stos;
     delete_function(stos);
     int pom;
-
 	while(!stos.empty())
 	{
 	    pom=stos.top();
 	    stos.pop();
-		remove(&root,pom);
+		remove(&wsk,pom);
 	}
-	cout<<"\nPO USUNIECIU, A POTEM ZROWNOWAZONE:\n";
-     printBT("","",&root);
+	cout<<"PO USUNIECIU:\n";
+     printBT("","",wsk);
 
-    wsk=&root;
-    to_list(&wsk);
-    list_to_avl(&wsk,size);
-    printBT("","",wsk);
-    cout<<endl;
-
-	clear(&root, 0);
-	clear(&root_avl,0);
+	clear(wsk, 0);
+	wsk=&root_avl;
+	clear(wsk,0);
 
 	_getch();
     return 0;
